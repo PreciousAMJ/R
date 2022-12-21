@@ -343,7 +343,7 @@ for(pages in 1:5){
   Books <- rbind(Books, data.frame(Book_Title, Author, Published_Date, Book_Format, Price, Link, stringsAsFactors = FALSE)) # rbind prevents the new data from overriding the old ones. instead, they'll join the old ones as a row. The first argument (books, a dataframe we've created earlier), will take in the old data, the second argument(dataframe) will take in the new data and the rbind function adds it to the old ones a new set of rows.
   } 
 
-View(Books)
+print(Books)
 ```
 
 Next, we’ll write the dataframe into a csv file so we can save it as csv
