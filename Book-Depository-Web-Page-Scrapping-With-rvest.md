@@ -345,7 +345,7 @@ for(pages in 1:5){
 
 ```
 ``` r
-print(Books)
+View(Books)
 ```
 Next, we’ll write the dataframe into a csv file so we can save it as csv
 file.
