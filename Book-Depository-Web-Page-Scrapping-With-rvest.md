@@ -1,0 +1,371 @@
+Book Depository Web Page Scrapping With rvest
+================
+
+Let’s load the packages we’ll be using
+
+``` r
+library(rvest)
+```
+
+    ## Warning: package 'rvest' was built under R version 4.2.2
+
+``` r
+library(dplyr)
+```
+
+    ## Warning: package 'dplyr' was built under R version 4.2.1
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+library(stringr)
+```
+
+    ## Warning: package 'stringr' was built under R version 4.2.1
+
+``` r
+Link <- "https://www.bookdepository.com/bestsellers" # The link to the page we want to scrap from.
+
+Page_HTML <- read_html(Link) # we'll get the html content of the page using "read_html" function from rvest
+
+print(Page_HTML)
+```
+
+    ## {html_document}
+    ## <html lang="en">
+    ## [1] <head>\n<link rel="preconnect" href="https://d3ogvdx946i4sr.cloudfront.ne ...
+    ## [2] <body class="seasonal-theme-xmas ">\n    <img height="1" width="1" style= ...
+
+we’ll use the ‘SelectorGadget’ browser extension (can be downloaded from
+the edge extension store) to identify the nodes containing each
+text/link we want to extract we’ll extract the text from html_node
+containing the book title.
+
+``` r
+Book_Title <-  Page_HTML %>%
+  html_nodes(".title a") %>%
+  html_text()
+
+print(Book_Title)
+```
+
+    ##  [1] "\n                    Grandmaster of Demonic Cultivation: Mo Dao Zu Shi (Novel) Vol. 4"                  
+    ##  [2] "\n                    It Ends With Us: The most heartbreaking novel you'll ever read"                    
+    ##  [3] "\n                    Atomic Habits"                                                                     
+    ##  [4] "\n                    Heaven Official's Blessing: Tian Guan Ci Fu (Novel) Vol. 5"                        
+    ##  [5] "\n                    The Tools"                                                                         
+    ##  [6] "\n                    How to Meet Your Self"                                                             
+    ##  [7] "\n                    Before the Coffee Gets Cold"                                                       
+    ##  [8] "\n                    Still Life"                                                                        
+    ##  [9] "\n                    Never Finished"                                                                    
+    ## [10] "\n                    Verity"                                                                            
+    ## [11] "\n                    Four Thousand Weeks"                                                               
+    ## [12] "\n                    The Little Book of Common Sense Investing"                                         
+    ## [13] "\n                    Daisy Haites: The Great Undoing"                                                   
+    ## [14] "\n                    The Boy, The Mole, The Fox and The Horse"                                          
+    ## [15] "\n                    Seven Husbands of Evelyn Hugo"                                                     
+    ## [16] "\n                    The Thursday Murder Club"                                                          
+    ## [17] "\n                    Grandmaster of Demonic Cultivation: Mo Dao Zu Shi (Novel) Vol. 5 (Special Edition)"
+    ## [18] "\n                    Mushoku Tensei: Jobless Reincarnation (Light Novel) Vol. 9"                        
+    ## [19] "\n                    Small Things Like These"                                                           
+    ## [20] "\n                    The Climate Book"                                                                  
+    ## [21] "\n                    Moonology (TM) Diary 2023"                                                         
+    ## [22] "\n                    Mushoku Tensei: Jobless Reincarnation (Light Novel) Vol. 7"                        
+    ## [23] "\n                    The Secret History"                                                                
+    ## [24] "\n                    Golden Terrace: Volume 2"                                                          
+    ## [25] "\n                    The Midnight Library"                                                              
+    ## [26] "\n                    The Sun, the Sea and the Stars"                                                    
+    ## [27] "\n                    Me vs Brain"                                                                       
+    ## [28] "\n                    The Body Keeps the Score"                                                          
+    ## [29] "\n                    Brain Games For Clever Kids (R)"                                                   
+    ## [30] "\n                    The Psychology of Money"
+
+From the output of the texts, we still need to do a bit of cleaning on
+our texts. We’ll use str_remove-all from the “stringr” library to remove
+the unwanted characters and whitespaces from our texts.
+
+First, we’ll create a vector containing all the characters we want to
+remove including the white spaces, then we’ll pass it into a for loop,
+using the “str_remove_all” function from stringr to remove each of them
+from our text.
+
+``` r
+Remove <- c("\n                ", "  ")
+for (x in Remove){
+  Book_Title <- str_remove_all(Book_Title, x)
+  }
+
+print(Book_Title)
+```
+
+    ##  [1] "Grandmaster of Demonic Cultivation: Mo Dao Zu Shi (Novel) Vol. 4"                  
+    ##  [2] "It Ends With Us: The most heartbreaking novel you'll ever read"                    
+    ##  [3] "Atomic Habits"                                                                     
+    ##  [4] "Heaven Official's Blessing: Tian Guan Ci Fu (Novel) Vol. 5"                        
+    ##  [5] "The Tools"                                                                         
+    ##  [6] "How to Meet Your Self"                                                             
+    ##  [7] "Before the Coffee Gets Cold"                                                       
+    ##  [8] "Still Life"                                                                        
+    ##  [9] "Never Finished"                                                                    
+    ## [10] "Verity"                                                                            
+    ## [11] "Four Thousand Weeks"                                                               
+    ## [12] "The Little Book of Common Sense Investing"                                         
+    ## [13] "Daisy Haites: The Great Undoing"                                                   
+    ## [14] "The Boy, The Mole, The Fox and The Horse"                                          
+    ## [15] "Seven Husbands of Evelyn Hugo"                                                     
+    ## [16] "The Thursday Murder Club"                                                          
+    ## [17] "Grandmaster of Demonic Cultivation: Mo Dao Zu Shi (Novel) Vol. 5 (Special Edition)"
+    ## [18] "Mushoku Tensei: Jobless Reincarnation (Light Novel) Vol. 9"                        
+    ## [19] "Small Things Like These"                                                           
+    ## [20] "The Climate Book"                                                                  
+    ## [21] "Moonology (TM) Diary 2023"                                                         
+    ## [22] "Mushoku Tensei: Jobless Reincarnation (Light Novel) Vol. 7"                        
+    ## [23] "The Secret History"                                                                
+    ## [24] "Golden Terrace: Volume 2"                                                          
+    ## [25] "The Midnight Library"                                                              
+    ## [26] "The Sun, the Sea and the Stars"                                                    
+    ## [27] "Me vs Brain"                                                                       
+    ## [28] "The Body Keeps the Score"                                                          
+    ## [29] "Brain Games For Clever Kids (R)"                                                   
+    ## [30] "The Psychology of Money"
+
+To get the book author’s name.
+
+``` r
+Author <- Page_HTML %>%
+  html_nodes(".author a") %>%
+  html_text()
+
+print(Author)
+```
+
+    ##  [1] "Mo Xiang Tong Xiu"   "Colleen Hoover"      "James Clear"        
+    ##  [4] "Mo Xiang Tong Xiu"   "Phil Stutz"          "Nicole Lepera"      
+    ##  [7] "Toshikazu Kawaguchi" "Louise Penny"        "David Goggins"      
+    ## [10] "Colleen Hoover"      "Oliver Burkeman"     "John C. Bogle"      
+    ## [13] "Jessa Hastings"      "Charlie Mackesy"     "Taylor Jenkins Reid"
+    ## [16] "Richard Osman"       "Mo Xiang Tong Xiu;"  "Rifujin Na Magonote"
+    ## [19] "Claire Keegan"       "Greta Thunberg"      "Yasmin Boland"      
+    ## [22] "Rifujin Na Magonote" "Donna Tartt"         "Cang Wu Bin Bai"    
+    ## [25] "Matt Haig"           "Iulia Bochis"        "Hayley Morris"      
+    ## [28] "Bessel van der Kolk" "Gareth Moore"        "Morgan Housel"
+
+To get the published date fro each book
+
+``` r
+Published_Date <- Page_HTML %>%
+  html_nodes(".published") %>%
+  html_text()
+
+print(Published_Date)
+```
+
+    ##  [1] "13 Dec 2022" "02 Aug 2016" "27 Nov 2018" "20 Dec 2022" "09 Oct 2014"
+    ##  [6] "08 Dec 2022" "19 Sep 2019" "01 Oct 2021" "06 Dec 2022" "20 Jan 2022"
+    ## [11] "07 Apr 2022" "08 Dec 2017" "15 Dec 2022" "04 Nov 2019" "14 Oct 2021"
+    ## [16] "13 May 2021" "02 May 2023" "30 Mar 2021" "03 Nov 2022" "27 Oct 2022"
+    ## [21] "30 Aug 2022" "27 Oct 2020" "01 Jul 1995" "15 Nov 2022" "18 Feb 2021"
+    ## [26] "01 Sep 2022" "16 Feb 2023" "24 Sep 2015" "01 Oct 2014" "08 Sep 2020"
+
+To get the book formats
+
+``` r
+Book_Format <- Page_HTML %>%
+  html_nodes(".format") %>%
+  html_text()
+
+print(Book_Format)
+```
+
+    ##  [1] "Paperback" "Paperback" "Paperback" "Paperback" "Paperback" "Paperback"
+    ##  [7] "Paperback" "Paperback" "Paperback" "Paperback" "Paperback" "Hardback" 
+    ## [13] "Paperback" "Hardback"  "Paperback" "Paperback" "Paperback" "Paperback"
+    ## [19] "Paperback" "Hardback"  "Paperback" "Paperback" "Paperback" "Paperback"
+    ## [25] "Paperback" "Hardback"  "Hardback"  "Paperback" "Paperback" "Paperback"
+
+To get the price for each book
+
+``` r
+Price <- Page_HTML %>%
+  html_nodes(".sale-price") %>%
+  html_text()
+
+print(Price)
+```
+
+    ##  [1] "US$25.54" "US$13.11" "US$22.67" "US$30.31" "US$20.44" "US$25.83"
+    ##  [7] "US$13.64" "US$13.53" "US$34.29" "US$11.81" "US$15.82" "US$24.34"
+    ## [13] "US$19.00" "US$25.30" "US$13.26" "US$14.07" "US$26.99" "US$17.99"
+    ## [19] "US$12.50" "US$44.62" "US$15.77" "US$20.77" "US$17.27" "US$12.58"
+    ## [25] "US$22.12" "US$23.14" "US$19.20" "US$7.73"  "US$19.26"
+
+To get the link to each book
+
+``` r
+Link <- Page_HTML %>%
+  html_nodes(".title a") %>%
+  html_attr("href")
+
+print(Link)
+```
+
+    ##  [1] "/Grandmaster-Demonic-Cultivation-Mo-Dao-Zu-Shi-Novel-Vol-4-Mo-Xiang-Tong-Xiu/9781638583011"                
+    ##  [2] "/It-Ends-With-Us-most-heartbreaking-novel-youll-ever-read-Colleen-Hoover/9781471156267"                    
+    ##  [3] "/Atomic-Habits-James-Clear/9781847941831"                                                                  
+    ##  [4] "/Heaven-Officials-Blessing-Tian-Guan-Ci-Fu-Novel-Vol-5-Mo-Xiang-Tong-Xiu/9781638585503"                    
+    ##  [5] "/Tools-Phil-Stutz/9780812983043"                                                                           
+    ##  [6] "/How-Meet-Your-Self-Nicole-Lepera/9781398710733"                                                           
+    ##  [7] "/Before-Coffee-Gets-Cold-Toshikazu-Kawaguchi/9781529029581"                                                
+    ##  [8] "/Still-Life-Louise-Penny/9781529386691"                                                                    
+    ##  [9] "/Never-Finished-David-Goggins/9781544534077"                                                               
+    ## [10] "/Verity-Colleen-Hoover/9781408726600"                                                                      
+    ## [11] "/Four-Thousand-Weeks-Oliver-Burkeman/9781784704001"                                                        
+    ## [12] "/Little-Book-Common-Sense-Investing-John-C-Bogle/9781119404507"                                            
+    ## [13] "/Daisy-Haites-Great-Undoing-Jessa-Hastings/9781398717237"                                                  
+    ## [14] "/Boy-Mole-Fox-Horse-Charlie-Mackesy/9781529105100"                                                         
+    ## [15] "/Seven-Husbands-Evelyn-Hugo-Taylor-Jenkins-Reid/9781398515697"                                             
+    ## [16] "/Thursday-Murder-Club-Richard-Osman/9780241988268"                                                         
+    ## [17] "/Grandmaster-Demonic-Cultivation-Mo-Dao-Zu-Shi-Novel-Vol-5-Special-Edition-Mo-Xiang-Tong-Xiu/9781685798406"
+    ## [18] "/Mushoku-Tensei-Jobless-Reincarnation-Light-Novel-Vol-9-Rifujin-Na-Magonote/9781645059523"                 
+    ## [19] "/Small-Things-Like-These-Claire-Keegan/9780571368709"                                                      
+    ## [20] "/Climate-Book-Greta-Thunberg/9780241547472"                                                                
+    ## [21] "/Moonology-TM-Diary-2023-Yasmin-Boland/9781788176583"                                                      
+    ## [22] "/Mushoku-Tensei-Jobless-Reincarnation-Light-Novel-Vol-7-Rifujin-Na-Magonote/9781645057536"                 
+    ## [23] "/Secret-History-Donna-Tartt/9780140167771"                                                                 
+    ## [24] "/Golden-Terrace-2-Cang-Wu-Bin-Bai/9781956609967"                                                           
+    ## [25] "/Midnight-Library-Matt-Haig/9781786892737"                                                                 
+    ## [26] "/Sun-Sea-Stars-Iulia-Bochis/9781529149678"                                                                 
+    ## [27] "/Me-vs-Brain-Hayley-Morris/9781529196047"                                                                  
+    ## [28] "/Body-Keeps-Score-Bessel-van-der-Kolk/9780141978611"                                                       
+    ## [29] "/Brain-Games-For-Clever-Kids-R-Gareth-Moore/9781780552491"                                                 
+    ## [30] "/Psychology-Money-Morgan-Housel/9780857197689"
+
+From the output above, the link is not complete. We still need to
+include “<https://www.bookdepository.com>” before the first slash. So
+we’ll use the “str_c” function from stringr package to concatenate them
+together.
+
+``` r
+Link <- str_c("https://www.bookdepository.com", Link, sep = "", collapse = NULL)
+
+print(Link)
+```
+
+    ##  [1] "https://www.bookdepository.com/Grandmaster-Demonic-Cultivation-Mo-Dao-Zu-Shi-Novel-Vol-4-Mo-Xiang-Tong-Xiu/9781638583011"                
+    ##  [2] "https://www.bookdepository.com/It-Ends-With-Us-most-heartbreaking-novel-youll-ever-read-Colleen-Hoover/9781471156267"                    
+    ##  [3] "https://www.bookdepository.com/Atomic-Habits-James-Clear/9781847941831"                                                                  
+    ##  [4] "https://www.bookdepository.com/Heaven-Officials-Blessing-Tian-Guan-Ci-Fu-Novel-Vol-5-Mo-Xiang-Tong-Xiu/9781638585503"                    
+    ##  [5] "https://www.bookdepository.com/Tools-Phil-Stutz/9780812983043"                                                                           
+    ##  [6] "https://www.bookdepository.com/How-Meet-Your-Self-Nicole-Lepera/9781398710733"                                                           
+    ##  [7] "https://www.bookdepository.com/Before-Coffee-Gets-Cold-Toshikazu-Kawaguchi/9781529029581"                                                
+    ##  [8] "https://www.bookdepository.com/Still-Life-Louise-Penny/9781529386691"                                                                    
+    ##  [9] "https://www.bookdepository.com/Never-Finished-David-Goggins/9781544534077"                                                               
+    ## [10] "https://www.bookdepository.com/Verity-Colleen-Hoover/9781408726600"                                                                      
+    ## [11] "https://www.bookdepository.com/Four-Thousand-Weeks-Oliver-Burkeman/9781784704001"                                                        
+    ## [12] "https://www.bookdepository.com/Little-Book-Common-Sense-Investing-John-C-Bogle/9781119404507"                                            
+    ## [13] "https://www.bookdepository.com/Daisy-Haites-Great-Undoing-Jessa-Hastings/9781398717237"                                                  
+    ## [14] "https://www.bookdepository.com/Boy-Mole-Fox-Horse-Charlie-Mackesy/9781529105100"                                                         
+    ## [15] "https://www.bookdepository.com/Seven-Husbands-Evelyn-Hugo-Taylor-Jenkins-Reid/9781398515697"                                             
+    ## [16] "https://www.bookdepository.com/Thursday-Murder-Club-Richard-Osman/9780241988268"                                                         
+    ## [17] "https://www.bookdepository.com/Grandmaster-Demonic-Cultivation-Mo-Dao-Zu-Shi-Novel-Vol-5-Special-Edition-Mo-Xiang-Tong-Xiu/9781685798406"
+    ## [18] "https://www.bookdepository.com/Mushoku-Tensei-Jobless-Reincarnation-Light-Novel-Vol-9-Rifujin-Na-Magonote/9781645059523"                 
+    ## [19] "https://www.bookdepository.com/Small-Things-Like-These-Claire-Keegan/9780571368709"                                                      
+    ## [20] "https://www.bookdepository.com/Climate-Book-Greta-Thunberg/9780241547472"                                                                
+    ## [21] "https://www.bookdepository.com/Moonology-TM-Diary-2023-Yasmin-Boland/9781788176583"                                                      
+    ## [22] "https://www.bookdepository.com/Mushoku-Tensei-Jobless-Reincarnation-Light-Novel-Vol-7-Rifujin-Na-Magonote/9781645057536"                 
+    ## [23] "https://www.bookdepository.com/Secret-History-Donna-Tartt/9780140167771"                                                                 
+    ## [24] "https://www.bookdepository.com/Golden-Terrace-2-Cang-Wu-Bin-Bai/9781956609967"                                                           
+    ## [25] "https://www.bookdepository.com/Midnight-Library-Matt-Haig/9781786892737"                                                                 
+    ## [26] "https://www.bookdepository.com/Sun-Sea-Stars-Iulia-Bochis/9781529149678"                                                                 
+    ## [27] "https://www.bookdepository.com/Me-vs-Brain-Hayley-Morris/9781529196047"                                                                  
+    ## [28] "https://www.bookdepository.com/Body-Keeps-Score-Bessel-van-der-Kolk/9780141978611"                                                       
+    ## [29] "https://www.bookdepository.com/Brain-Games-For-Clever-Kids-R-Gareth-Moore/9781780552491"                                                 
+    ## [30] "https://www.bookdepository.com/Psychology-Money-Morgan-Housel/9780857197689"
+
+The steps above will suffice if our goal is to scrap only the first page
+of the weblink, in which case we’ll just add each variable into a
+dataframe.
+
+What we’ll do is to create a for loop that will scrap each page (we’ll
+scrap pages 1 to 5) using the same code from the steps above.
+
+``` r
+Books <- data.frame()
+
+for(pages in 1:5){
+  Link <- paste0("https://www.bookdepository.com/bestsellers?page=", pages)
+
+  Page_HTML <- read_html(Link)
+
+  Book_Title <-  Page_HTML %>%
+  html_nodes(".title a") %>%
+  html_text()
+
+  Remove <- c("\n                ", "  ")
+  for (x in Remove)
+  {Book_Title <- str_remove_all(Book_Title, x)}
+
+  Author <- Page_HTML %>%
+  html_nodes(".author a") %>%
+  html_text()
+
+  Published_Date <- Page_HTML %>%
+  html_nodes(".published") %>%
+  html_text()
+
+  Book_Format <- Page_HTML %>%
+  html_nodes(".format") %>%
+  html_text()
+
+  Price <- Page_HTML %>%
+  html_nodes(".sale-price") %>%
+  html_text()
+  
+  length(Price) <- length(Book_Title) # the length of variable "Price" seems to be lesser than the the rest, so we make it equal to one of the variables
+
+  Link <- Page_HTML %>%
+  html_nodes(".title a") %>%
+  html_attr("href")
+
+  Link <- str_c("https://www.bookdepository.com", Link, sep = "", collapse = NULL)
+  
+  
+
+  Books <- rbind(Books, data.frame(Book_Title, Author, Published_Date, Book_Format, Price, Link, stringsAsFactors = FALSE)) # rbind prevents the new data from overriding the old ones. instead, they'll join the old ones as a row. The first argument (books, a dataframe we've created earlier), will take in the old data, the second argument(dataframe) will take in the new data and the rbind function adds it to the old ones a new set of rows.
+  } 
+
+View(Books)
+```
+
+Next, we’ll write the dataframe into a csv file so we can save it as csv
+file.
+
+``` r
+setwd("C:\\Users\\HP\\Documents\\Datasets") # to set the working directory - where our csv file we'll be saved
+
+Books <- as.data.frame(Books) # to convert book to a dataframe, this is needed so we can write it into a csv file
+
+library("readr") # the library we'll using to write the csv
+```
+
+    ## Warning: package 'readr' was built under R version 4.2.1
+
+    ## 
+    ## Attaching package: 'readr'
+
+    ## The following object is masked from 'package:rvest':
+    ## 
+    ##     guess_encoding
+
+``` r
+write_csv(Books, file = "C:\\Users\\HP\\Documents\\Datasets\\Books.csv")
+```
